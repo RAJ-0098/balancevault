@@ -1,0 +1,162 @@
+// BalanceVault — Prisma schema
+// PostgreSQL with least-privilege roles. See prisma/sql/ for role setup.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  ACCOUNT_HOLDER
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+}
+
+enum AccountStatus {
+  PENDING
+  ACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum OnboardingStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum AuditAction {
+  USER_REGISTERED
+  USER_LOGIN
+  USER_LOGIN_FAILED
+  USER_SUSPENDED
+  USER_REACTIVATED
+  ONBOARDING_SUBMITTED
+  ONBOARDING_APPROVED
+  ONBOARDING_REJECTED
+  ACCOUNT_CREATED
+  ACCOUNT_FROZEN
+  ACCOUNT_CLOSED
+  TRANSACTION_CREATED
+  TRANSACTION_TRANSFER
+  ADMIN_BOOTSTRAP
+  ROLE_CHANGED
+}
+
+// ─── Models ───────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  role         Role       @default(ACCOUNT_HOLDER)
+  status       UserStatus @default(PENDING)
+  firstName    String?    @map("first_name")
+  lastName     String?    @map("last_name")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  accounts           Account[]
+  auditLogs          AuditLog[]
+  onboardingRequests OnboardingRequest[]
+  onboardingProcessed OnboardingRequest[] @relation("OnboardingProcessedBy")
+
+  @@map("users")
+}
+
+model Account {
+  id        String        @id @default(uuid())
+  userId    String        @map("user_id")
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      AccountType   @default(CHECKING)
+  status    AccountStatus @default(PENDING)
+  balance   Decimal        @default(0) @db.Decimal(19, 4)
+  currency  String         @default("USD")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  transactions Transaction[]
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Transaction {
+  id           String            @id @default(uuid())
+  accountId    String            @map("account_id")
+  account      Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  type         TransactionType
+  amount       Decimal            @db.Decimal(19, 4)
+  status       TransactionStatus  @default(COMPLETED)
+  description  String?
+  reference    String?           @map("reference")
+  balanceAfter Decimal           @db.Decimal(19, 4) @map("balance_after")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  @@index([accountId])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+model OnboardingRequest {
+  id           String           @id @default(uuid())
+  userId       String           @map("user_id")
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       OnboardingStatus @default(SUBMITTED)
+  processedById String?         @map("processed_by_id")
+  processedBy  User?             @relation("OnboardingProcessedBy", fields: [processedById], references: [id])
+  notes        String?
+  submittedAt  DateTime         @default(now()) @map("submitted_at")
+  reviewedAt   DateTime?        @map("reviewed_at")
+
+  @@index([userId])
+  @@index([status])
+  @@map("onboarding_requests")
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  userId     String?     @map("user_id")
+  user       User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      AuditAction
+  targetType  String?    @map("target_type")
+  targetId    String?    @map("target_id")
+  metadata    Json?
+  ipAddress   String?    @map("ip_address")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

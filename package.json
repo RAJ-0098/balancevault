@@ -1,0 +1,28 @@
+{
+  "name": "balancevault",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Secure account management platform with role-based access, onboarding workflows, and auditable account operations.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev -w @balancevault/backend\" \"npm run dev -w @balancevault/frontend\"",
+    "dev:backend": "npm run dev -w @balancevault/backend",
+    "dev:frontend": "npm run dev -w @balancevault/frontend",
+    "build": "npm run build -w @balancevault/frontend && npm run build -w @balancevault/backend",
+    "start": "npm run start -w @balancevault/backend",
+    "db:generate": "npm run db:generate -w @balancevault/backend",
+    "db:migrate": "npm run db:migrate -w @balancevault/backend",
+    "db:deploy": "npm run db:deploy -w @balancevault/backend",
+    "db:seed": "npm run db:seed -w @balancevault/backend",
+    "db:roles": "npm run db:roles -w @balancevault/backend",
+    "bootstrap": "npm run bootstrap -w @balancevault/backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
