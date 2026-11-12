@@ -23,7 +23,7 @@ const int = (name, fallback) => {
 
 export const env = {
   databaseUrl: required('DATABASE_URL'),
-  redisUrl: optional('REDIS_URL', 'redis://localhost:6379'),
+  redisUrl: optional('REDIS_URL', ''),
   jwtSecret: required('JWT_SECRET'),
   jwtRefreshSecret: required('JWT_REFRESH_SECRET'),
   jwtExpiresIn: optional('JWT_EXPIRES_IN', '15m'),
