@@ -1,3 +1,20 @@
+## Live Demo
+
+**Try BalanceVault:** [Open Live Application](https://balancevault-frontend-s2ps.onrender.com)
+
+**Backend API:** https://balancevault-nl5w.onrender.com
+
+The frontend and backend are deployed separately on Render. The application uses Neon PostgreSQL for persistent data storage.
+
+> Note: The backend may take some time to respond after a period of inactivity because of free-tier hosting limitations.
+
+### Demo Access
+
+Users can register through the application and complete the onboarding workflow. Administrative functionality requires an authorized administrator account.
+
+This is a demonstration application using synthetic data. Do not enter real financial or sensitive personal information.
+
+
 # BalanceVault
 
 Money movement with a ledger you can prove.
@@ -150,3 +167,4 @@ The `bootstrap_login` role uses `NOINHERIT`, so it must explicitly `SET ROLE boo
 ## Disclaimer
 
 This is a hackathon demonstration using synthetic data. It is not a production financial service or a system for handling real funds.
+
