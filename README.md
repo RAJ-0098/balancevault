@@ -1,8 +1,7 @@
 ## Live Demo
 
-**Try BalanceVault:** [Open Live Application](https://balancevault-frontend-s2ps.onrender.com)
+**Try BalanceVault:** [Open Live Application](https://balancevault-frontend-s2ps.onrender.com/login)
 
-**Backend API:** https://balancevault-nl5w.onrender.com
 
 The frontend and backend are deployed separately on Render. The application uses Neon PostgreSQL for persistent data storage.
 
